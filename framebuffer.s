@@ -89,7 +89,7 @@ drawPixel:
 	movhi	pc,	lr
 	
 	ldr	addr,	=FrameBufferPointer
-	ldr	addr,	[addr]
+
 	
 	mla	x,	width,y, x
 	.unreq	width
