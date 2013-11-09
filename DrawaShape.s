@@ -7,7 +7,7 @@ xOffset		.req	r0
 yOffset		.req	r1
 length	.req	r2
 mov	r3,	xOffset
-mov	r4, 	yOffset
+mov	r4,   yOffset
 mov	r5,	length
 ldr	r6,	=width
 ldr	r6,	[r6]
@@ -35,60 +35,67 @@ pop	{}
 . global drawGrid
 drawGrid:
 
-push{}
+push{r4,r5, r6, lr}
 
-x	.req	r0
-y	.req	r1
-length	.req	r2
-ldr	r6,	=GridNum
-ldr	r6,	[r4, #0]
-ldr	r5,	=BlockSize
-ldr	r5,	[r5, #0]
+x	.req	r4
+y	.req	r5
+colour .req r6
+mov  x, r4
+mov  y, r5
 
-maxY	req.	r3
-maxX	req.	r4
+ldr	r0,	=GridNum
+ldr	r0,	[r0, #0]
+ldr	r1,	=BlockSize
+ldr	r1,	[r1, #0]
+
+maxY	req.	r2
+maxX	req.	r3
 
 
-mul	maxY, r6,r5
+mul	maxY, r0,r1
 
-ldr	r6,	=GridNum
-ldr	r6,	[r4, #4]
-ldr	r5,	=BlockSize
-ldr	r5,	[r5, #4]
+ldr	r0,	=GridNum
+ldr	r0,	[r0, #4]
+ldr	r1,	=BlockSize
+ldr	r1,	[r1, #4]
 
-mul	maxX,	r6,r5
-ldr	y
-ldr	r6,	=BlockSize
-ldr	r6,	[r5, #0]
-mov	length,	maxX
+mul	maxX,	r0,r1
 
+ldr	r0,	=BlockSize
+ldr	r0,	[r0, #0]
+
+mov  r1, y
 
 rows:
 	cmp	y,maxY
 	bhi	rowFin
 	bl	drawHorizontalLine
-	add	y,	r6
+	add	y,	r0
 	b	rows	
 rowFin:
 
-mov	length,	maxY
-mov	y,	r5
-ldr	r6,	=BlockSize
-ldr	r6,	[r5, #4]
+
+mov	y,	r1
+
+
+ldr	r0,	=BlockSize
+ldr	r0,	[r0, #4]
+
+mov r1, x
 columns:
 	cmp	x,maxX
 	bhi	columnFin
 	bl	drawVerticalLine
-	add	x,	r6
+	add	x,	r0
 	b	columns	
 
 .unreq	x
 .unreq	y
-.unreq	length
+
 .unreq	maxX
 .unreq	maxY
 
-pop{}
+pop{r4,r5, r6, pc}
 
 .data
 
