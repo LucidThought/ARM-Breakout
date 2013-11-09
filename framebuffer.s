@@ -59,46 +59,50 @@ pointerWait$:
 	.unreq	infoAdr
 
 
-//r0 = x
-//r1 = y
-//r2 = colour
+//r4 = x
+//r5 = y
+//r6 = colour
 .global drawPixel
 
 drawPixel:
-	/* r0 is x, r1 is y and r3 is addr*/
-	
-	
-	/* r0 is x, r1 is y and r3 is addr*/
-	x	.req	r0
-	y	.req	r1
-	addr	.req	r3
+ 
+    push    {r4,r5,r6, lr}
+    
+    /* r0 is x, r1 is y and r3 is addr*/
+    
+    x    .req    r0
+    y    .req    r1
+    addr    .req    r3
+    mov    x,    r4
+    mov    y,    r5
+    mov    r2,    r6
+    ldr    addr,    =FrameBufferInfo
+    
+    height    .req    r4
+    ldr    height,    [addr,    #4]
+    sub    height,    #1
+    cmp    y,    height
+    movhi    pc,    lr
+    .unreq    height    
 
-	ldr	addr,	=FrameBufferInfo
-	
-	
-	height	.req	r4
-	ldr	height,	[addr, #4]
-	sub	height,	#1
-	cmp	y,	height
-	movhi	pc,	lr
-	.unreq	height
-	width	.req	r4
-	ldr	width,	[addr,	#0]
-	cmp	x,	width
-	sub	width,	#1
-	movhi	pc,	lr
-	
-	ldr	addr,	=FrameBufferPointer
-  ldr	addr,	[addr]
-	
-	mla	x,	width,y, x
-	.unreq	width
-	.unreq	y
+    width    .req    r4
+    ldr    width,    [addr,    #0]
+    sub    width,    #1
+    cmp    x,    width
+    movhi    pc,    lr
+    
+    
+    ldr    addr,    =FrameBufferPointer
+    ldr    addr,    [addr]
+    add    width,    #1
+    mla    x,    y,width, x
+    
+    .unreq    y
 
-	add	addr,	x, lsl #1
-	.unreq	x
-	
-	strh	r2,	[addr]
-	.unreq	addr	
-
-	mov	pc,	lr
+    add    addr,    x, lsl #1
+    .unreq    x
+    
+    strh    r2,    [addr]
+    .unreq    addr    
+    poppixel:
+    pop    {r4,r5,r6, pc}
