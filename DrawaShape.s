@@ -2,7 +2,7 @@
 . global drawBox
 drawBox:
 
-push	{}
+push	{lr}
 xOffset		.req	r0
 yOffset		.req	r1
 length	.req	r2
@@ -29,9 +29,9 @@ bl	drawVerticalLine
 .unreq	xOffset
 .unreq	yOffset
 .unreq	length
-pop	{}
+pop	{pc}
 
-//r0=x, r1=y, 
+//r4=x, r5=y
 . global drawGrid
 drawGrid:
 
@@ -43,6 +43,7 @@ colour .req r6
 mov  x, r4
 mov  y, r5
 
+//gets the number of blocks in the grid and the size of each block
 ldr	r0,	=GridNum
 ldr	r0,	[r0, #0]
 ldr	r1,	=BlockSize
@@ -51,7 +52,7 @@ ldr	r1,	[r1, #0]
 maxY	req.	r2
 maxX	req.	r3
 
-
+//get length y axis of the grid
 mul	maxY, r0,r1
 
 ldr	r0,	=GridNum
@@ -59,13 +60,14 @@ ldr	r0,	[r0, #4]
 ldr	r1,	=BlockSize
 ldr	r1,	[r1, #4]
 
+//gets length of the x axis of the grid
 mul	maxX,	r0,r1
 
 ldr	r0,	=BlockSize
 ldr	r0,	[r0, #0]
 
 mov  r1, y
-
+//draws the rows
 rows:
 	cmp	y,maxY
 	bhi	rowFin
@@ -80,7 +82,7 @@ mov	y,	r1
 
 ldr	r0,	=BlockSize
 ldr	r0,	[r0, #4]
-
+//draws the colunms
 mov r1, x
 columns:
 	cmp	x,maxX
