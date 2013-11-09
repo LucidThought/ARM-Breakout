@@ -74,7 +74,7 @@ drawPixel:
 	addr	.req	r3
 
 	ldr	addr,	=FrameBufferInfo
-	ldr	addr,	[addr]
+	
 	
 	height	.req	r4
 	ldr	height,	[addr, #4]
@@ -89,7 +89,7 @@ drawPixel:
 	movhi	pc,	lr
 	
 	ldr	addr,	=FrameBufferPointer
-
+  ldr	addr,	[addr]
 	
 	mla	x,	width,y, x
 	.unreq	width
