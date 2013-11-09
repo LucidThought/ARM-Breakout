@@ -75,33 +75,33 @@ drawPixel:
     addr    .req    r3
     mov    x,    r4
     mov    y,    r5
-    mov    r2,    r6
+    mov    r2,    r6   //r2 is colour
     ldr    addr,    =FrameBufferInfo
-    
+    //checks if the x and y  are within the frame buffer 
     height    .req    r4
     ldr    height,    [addr,    #4]
     sub    height,    #1
     cmp    y,    height
-    movhi    pc,    lr
+    bhi    popPixel
     .unreq    height    
 
     width    .req    r4
     ldr    width,    [addr,    #0]
     sub    width,    #1
     cmp    x,    width
-    movhi    pc,    lr
+    bhi    popPixel
     
-    
+    //get frame pointer
     ldr    addr,    =FrameBufferPointer
     ldr    addr,    [addr]
     add    width,    #1
-    mla    x,    y,width, x
+    mla    x,    y,width, x  //x=(y*1024)+x
     
     .unreq    y
 
-    add    addr,    x, lsl #1
+    add    addr,    x, lsl #1  //add x*2 to frame buffer pointer
     .unreq    x
-    
+    //stores colour in address
     strh    r2,    [addr]
     .unreq    addr    
     poppixel:
