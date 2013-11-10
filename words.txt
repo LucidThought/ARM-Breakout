@@ -1,0 +1,42 @@
+.global Blast_Tru
+Blast_Tru:
+push	{lr}
+
+bl	B
+bl	L
+bl	Abig
+bl	Sbig
+bl	DoubleT
+bl	Rbig
+bl	U
+
+pop	{pc}
+
+.global	StartWord
+StartWord:
+push	{lr}
+
+bl	Ssmall
+bl	T
+bl	Asmall
+bl	Rsmall
+
+pop	{pc}
+
+.global	WinWord
+WinWord:
+push	{lr}
+bl	W
+bl	I
+bl	N
+pop	{pc}
+
+.global	LoseWord
+LoseWord:
+push	{lr}
+bl	Lbig
+bl	O
+bl	S
+bl	E
+pop	{pc}
+
