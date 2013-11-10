@@ -1,4 +1,5 @@
-.global clearScreen
+   
+ .global clearScreen
 clearScreen:
 
 push	{lr}
@@ -38,3 +39,4 @@ done:
 
 
 pop	{pc}
+ 
