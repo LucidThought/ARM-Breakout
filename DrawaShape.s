@@ -1,108 +1,212 @@
-// r0= x starting point, r1=y r2=height of box
-. global drawBox
+.section .text
+    
+.global drawBox
+/* r0 is x, r1 is y, r2=lengthX,r3=lenghtY */
 drawBox:
+    
+    push    {lr}
 
-push	{lr}
-xOffset		.req	r0
-yOffset		.req	r1
-length	.req	r2
-mov	r3,	xOffset
-mov	r4,   yOffset
-mov	r5,	length
-ldr	r6,	=width
-ldr	r6,	[r6]
-sub	xOffset,		r6,	r3
-sub	r6,	xoffset
-mov	length,	r6
-bl	drawHorizontal	Line
-add	r1,	r1,	r5
-mov	r0,	r3
-bl	drawHorizontalLine
-add	r0,	r3,	#1024
-mov	yOffset,		r4
-mov	length,	r5
-bl	drawVerticalLine
-mov	yOffset,		r4
-mov	xOffset,		r3
-bl	drawVerticalLine
+    x     .req     r0    
+    y     .req    r1
+    colour    .req    r2    
+    length    .req    r3
 
-.unreq	xOffset
-.unreq	yOffset
-.unreq	length
-pop	{pc}
+    
+    mov    r9,    r3
 
-//r4=x, r5=y
-. global drawGrid
+    mov    length,    r2
+
+    ldr    colour,    =colourInt
+    ldr    colour,    [colour, #4]
+    ldr    r6,    =tempVar
+    str    x,    [r6, #0]
+    str    y,    [r6, #4]
+    
+    bl    drawHLine
+
+    mov    r5,    r9
+    ldr    x,    =tempVar
+    ldr    x,    [x, #0]
+    add    y,    r5
+
+    bl    drawHLine
+
+
+    mov    length,    r5
+    mov    length, r9
+    mov    r9,    r5
+    
+    ldr    colour,    =colourInt
+    ldr    colour,    [colour, #0]
+
+    ldr    x,    =tempVar
+    ldr    x,    [x, #0]
+
+    ldr    y,    =tempVar
+    ldr    y,    [y, #4]
+
+
+    bl    drawVLine
+
+    ldr    x,    =tempVar
+    ldr    x,    [x, #0]
+
+    ldr    y,    =tempVar
+    ldr    y,    [y, #4]
+
+    add    x,    r9
+    
+    bl    drawVLine
+
+
+
+    pop    {pc}
+
+.global drawRect
+/* r0 is x, r1 is y, r2=lengthX,r3=lenghtY */
+drawRect:
+    
+    push    {lr}
+
+    x     .req     r0    
+    y     .req    r1
+    colour    .req    r2    
+    length    .req    r3
+
+    mov    r9,    r3
+    add    r9,    y
+    mov    length,    r2
+    fillLoop:
+    cmp    y,    r9
+    bhi    fDone
+    
+    ldr    colour,    =colourInt
+    ldr    colour,    [colour, #0]
+    ldr    r6,    =tempVar
+    str    x,    [r6, #0]
+    str    y,    [r6, #4]
+    
+    bl    drawHLine
+
+    ldr    x,    =tempVar
+    ldr    x,    [x, #0]
+    add    y,    #1
+
+    b    fillLoop
+
+    fDone:
+
+    .unreq    x
+    .unreq    y
+    .unreq    colour
+    .unreq    length    
+
+    pop    {pc}
+        
+
+/*r0=x, r1=y*/    
+.global drawGrid
 drawGrid:
+    push    {lr}
 
-push{r4,r5, r6, lr}
+    x     .req     r0    
+    y     .req    r1
+    colour    .req    r2
+    length    .req    r3
+    ldr    r6,    =tempVar
+    str    x,    [x, #0]
+    
+    ldr    r6,    =tempVar
+    str    y,    [y, #4]
 
-x	.req	r4
-y	.req	r5
-colour .req r6
-mov  x, r4
-mov  y, r5
+    ldr    colour,    =colourInt
+    ldr    colour,    [colour, #4]
+    
+    ldr    r6,    =blockInfo
+    ldr    r4,    [r6, #0]
+    ldr    r5,    [r6, #8]
+    
+    mul    length,    r4,r5
 
-//gets the number of blocks in the grid and the size of each block
-ldr	r0,	=GridNum
-ldr	r0,	[r0, #0]
-ldr	r1,	=BlockSize
-ldr	r1,	[r1, #0]
+    ldr    r10,    [r6, #4]
 
-maxY	req.	r2
-maxX	req.	r3
+    
+    rows:
+    cmp    r10,    #0
+    bls    rowsE
+    
+    bl    drawHLine
+    
+    ldr    x,    =tempVar
+    ldr    x,    [x, #0]
 
-//get length y axis of the grid
-mul	maxY, r0,r1
+    ldr    y,    =tempVar
+    ldr    y,    [y, #4]
 
-ldr	r0,	=GridNum
-ldr	r0,	[r0, #4]
-ldr	r1,	=BlockSize
-ldr	r1,	[r1, #4]
+    ldr    r6,    =blockInfo
+    ldr    r6,    [r6, #8]
 
-//gets length of the x axis of the grid
-mul	maxX,	r0,r1
+    add    y,    r6
 
-ldr	r0,	=BlockSize
-ldr	r0,	[r0, #0]
+    ldr    r6,    =tempVar
+    str    y,    [r6, #4]
+    
+    sub    r10, #1
+    
+    b    rows
 
-mov  r1, y
-//draws the rows
-rows:
-	cmp	y,maxY
-	bhi	rowFin
-	bl	drawHorizontalLine
-	add	y,	r0
-	b	rows	
-rowFin:
+    rowsE:
 
+    ldr    r6,    =blockInfo
+    ldr    r4,    [r6, #4]
+    ldr    r5,    [r6, #12]
 
-mov	y,	r1
+    mul    length,    r4,r5        
+    
+    ldr    r10,    [r6, #0]
 
+    columns:
+    cmp    r10,    #0
+    bls    columnsE
+    
+    bl    drawVLine
+    
+    ldr    x,    =tempVar
+    ldr    x,    [x, #0]
 
-ldr	r0,	=BlockSize
-ldr	r0,	[r0, #4]
-//draws the colunms
-mov r1, x
-columns:
-	cmp	x,maxX
-	bhi	columnFin
-	bl	drawVerticalLine
-	add	x,	r0
-	b	columns	
+    ldr    y,    =tempVar
+    ldr    y,    [y, #4]
+    
+    ldr    r6,    [r6, #12]
+    add    x,    r6
 
-.unreq	x
-.unreq	y
+    ldr    r6,    =tempVar
+    str    x,    [r6, #0]
+    
+    sub    r10, #1
+    
+    b    columns
+    
+    columnsE:
 
-.unreq	maxX
-.unreq	maxY
+    pop    {pc}
+    
 
-pop{r4,r5, r6, pc}
+.section .data
+.align 4
 
-.data
+colourInt:
+    .int    0xffCCff
+    .int    0xffffff
+LTemp:
+    .int
 
-GridNum:
-	.int	6, 30	//rows,columns
-blockSize:
-	.int	3	//h
-	.int	5	//w
+tempVar:
+    .int    //x
+    .int    //y
+
+blockInfo:
+    .int    10    //number x
+    .int    5    //number y
+    .int    5    //w
+    .int    10    //l
